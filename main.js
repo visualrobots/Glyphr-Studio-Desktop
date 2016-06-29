@@ -17,10 +17,10 @@ function createWindow () {
   
   let webContents = win.webContents;
   
-  webContents.on('new-window', function(event, url){
-    event.preventDefault();
-    open(url);
-  });
+ // webContents.on('new-window', function(event, url){
+  //  event.preventDefault();
+  //  open(url);
+  //});
   
   // webContents.openDevTools()
   
