@@ -22,7 +22,7 @@ function createWindow () {
   //  open(url);
   //});
   
-  // webContents.openDevTools()
+   webContents.openDevTools()
   
   win.on('closed', function () {
     win = null;
@@ -32,7 +32,7 @@ function createWindow () {
 app.on('ready', createWindow);
 
 app.on('window-all-closed', function () {
-    if (process.platform != 'darwin')
+    //if (process.platform != 'darwin')
       app.quit();
 });
 

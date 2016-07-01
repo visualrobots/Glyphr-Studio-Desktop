@@ -44,11 +44,52 @@ saveFile = function(fname, buffer) {
 };
 
 popOut = function(){
+  
+  var div = document.createElement('div');
+  div.appendChild(document.styleSheets[0].ownerNode.cloneNode(true));
+  var cssLine = div.innerHTML;
+  
+  var popOutScript = '';
+  
+  var newEntriesArray = findNewEntries();
+  // TODO: Technique fails to screen out anonymous functions (native electron calls)
+  for(var f in window) { 
+    if (window.hasOwnProperty(f) && !_UI.popout[f] && newEntriesArray.indexOf(f) > -1) {
+      if (typeof window[f] === 'function') {
+        popOutScript += window[f].toString()+'\n';
+      }
+      else if (typeof window[f] === 'object') {
+        try {
+          if (window[f]) {
+            popOutScript += 'var ' + f + '=' + JSON.stringify(window[f]) + ';'+'\n';
+          }
+        }
+        catch(e) {
+          //Fuck errors, we're doing nothing with this
+        }
+      }
+      else {
+        if (typeof window[f] === 'string' && !window[f]) {
+          popOutScript += 'var ' + f + '=' + '""' + ';'+'\n';
+        }
+        else {
+          popOutScript += 'var ' + f + '=' + window[f] + ';'+'\n';
+        }
+      }
+    }
+  }
+  
+  popOutScript += 'window.onBeforeUnload = popIn;\n'+
+                  'document.getElementById(\'mainwrapper\').style.overflowY = \'hidden\';\n'+
+                  'document.addEventListener(\'keypress\', keypress, false);\n'+
+                  'document.addEventListener(\'keydown\', keypress, false);\n'+
+                  'document.addEventListener(\'keyup\', keyup, false)';
+  
   var newWindow = '<!doctype html>\n'+
                   '<html>\n'+
                     '  <head>\n'+
                       '    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />\n'+
-                      '    <link rel="stylesheet" type="text/css" href="bower_components/glyphr-studio/dev/Glyphr_Studio.css" />\n'+
+                      '    <link rel="stylesheet" type="text/css" href="Glyphr_Studio.css" />\n'+
                       '    <title>Glyphr Studio - Canvas</title>\n'+
                     '  </head>\n'+
                     '  <body>\n'+
@@ -59,31 +100,17 @@ popOut = function(){
                     '  <script src="popOut.js"></script>\n'+
                   '</html>';
   
+  
+  fs.writeFileSync('popOut.js', popOutScript);
   fs.writeFileSync('popOut.html', newWindow);
   
   var newPath = path.join(__dirname, 'popOut.html');
   
-  _UI.popout = window.open(newPath, 'Glypher Studio - Tools');
+  _UI.popout = window.open(newPath);
 
   //Main Window
   document.title = 'Glyphr Studio - Tools';
-  console.log(document.body.classList);
   document.body.classList.add('poppedOut');
   
   navigate();
-
-  //Canvas Window
-  _UI.popout.document.head.appendChild(document.styleSheets[0].ownerNode.cloneNode(true));
-  _UI.popout.onBeforeUnload = popIn;
-  _UI.popout.document.getElementById('mainwrapper').style.overflowY = 'hidden';
-
-  for(var f in window){ if(window.hasOwnProperty(f) && !_UI.popout[f]){
-      _UI.popout[f] = window[f];
-  }}
-
-  getEditDocument().addEventListener('keypress', keypress, false);
-  getEditDocument().addEventListener('keydown', keypress, false);
-  getEditDocument().addEventListener('keyup', keyup, false);
-
-  //navigate();
 };
