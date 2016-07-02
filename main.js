@@ -13,7 +13,7 @@ function createWindow () {
     minHeight: 700,
     icon: process.platform === 'linux' && __dirname + '/images/icon.png'
   });
-  win.loadURL('file://' + __dirname + '/bower_components/glyphr-studio/dev/Glyphr_Studio_Autohacked_For_Electron.html');
+  win.loadURL('file://' + __dirname + '/bower_components/glyphr-studio/dev/Glyphr_Studio.html');
   
   let webContents = win.webContents;
   
