@@ -9,7 +9,7 @@
   },
   "main": "main.js",
   "dependencies": {
-    "open": "0.0.5"
+    "open": "7.1.0"
   },
   "devDependencies": {
     "electron-prebuilt": "1.4.1",
